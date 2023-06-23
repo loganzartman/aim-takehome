@@ -7,7 +7,7 @@
   "scripts": {
     "start": "run-p parcel-watch nodemon",
     "build": "parcel build",
-    "parcel-watch": "parcel watch",
+    "parcel-watch": "parcel --port 1235 watch",
     "nodemon": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
