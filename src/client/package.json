@@ -4,13 +4,12 @@
   "description": "",
   "source": "index.html",
   "scripts": {
-    "start": "parcel",
+    "start": "parcel --port 4567",
     "build": "parcel build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Logan Zartman",
   "devDependencies": {
     "parcel": "^2.9.2",
     "process": "^0.11.10"

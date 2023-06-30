@@ -7,13 +7,12 @@
   "scripts": {
     "start": "run-p parcel-watch nodemon",
     "build": "parcel build",
-    "parcel-watch": "parcel --port 1235 watch",
+    "parcel-watch": "parcel watch --port 5678",
     "nodemon": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Logan Zartman",
   "dependencies": {
     "express": "^4.18.2"
   },
