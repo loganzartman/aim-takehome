@@ -9,7 +9,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "ts-protoc-gen": "^0.15.0"
+  "devDependencies": {
+    "google-protobuf": "^3.21.2",
+    "protoc-gen-ts": "^0.8.6",
+    "typescript": "4.x.x"
   }
 }
