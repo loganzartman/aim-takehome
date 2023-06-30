@@ -2,8 +2,8 @@
 
 Dependencies: Node 16+, pnpm
 
-1. `cd src/client && pnpm install && pnpm start`
-2. `cd src/server && pnpm install && pnpm start`
+1. Get pnpm: `npm install -g pnpm`
+2. `pnpm start`
 3. navigate to [localhost:1234](http://localhost:1234)
 
 ## regenerating proto outputs
