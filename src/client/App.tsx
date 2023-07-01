@@ -6,6 +6,7 @@ import {
 } from './proto-generated/service';
 import {MapContainer, Marker, TileLayer} from 'react-leaflet';
 import {useState} from 'react';
+import Button from './components/Button';
 
 const GRPC_ADDRESS = 'http://localhost:8080';
 const seattleLat = 47.60884551040699;
@@ -69,14 +70,12 @@ export default function App() {
 
   return (
     <div>
-      <div>hello from react</div>
-      <button onClick={handleUnPause}>UnPause</button>
-      {!isStreaming && <div>⚠️ Not connected</div>}
       <MapContainer
-        style={{width: '600px', height: '400px'}}
+        className="absolute left-0 top-0 right-0 bottom-0"
         // @ts-ignore: Property 'center' does not exist; package types are incorrect
         center={[seattleLat, seattleLon]}
         zoom={15}
+        zoomControl={false}
         scrollWheelZoom
       >
         <TileLayer
@@ -86,6 +85,13 @@ export default function App() {
         />
         {machineMarkers}
       </MapContainer>
+      <div className="absolute left-0 top-0 z-[1000]">
+        <div className="max-w-full m-2 p-2 bg-white shadow-lg flex flex-col">
+          <div>Machines</div>
+          {isStreaming ? <div>✅ Connected</div> : <div>⚠️ Not connected</div>}
+          <Button onClick={handleUnPause}>UnPause</Button>
+        </div>
+      </div>
     </div>
   );
 }
