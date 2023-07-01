@@ -35,8 +35,8 @@ export class MachinesSimulator {
     this.machines.forEach((machine) => {
       // brownian motion
       if (!machine.is_paused) {
-        machine.location.lat += rand(0.00005);
-        machine.location.lon += rand(0.00005);
+        machine.location.lat += rand(0.0001);
+        machine.location.lon += rand(0.0001);
       }
     });
   }
