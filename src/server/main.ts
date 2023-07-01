@@ -6,18 +6,20 @@ import {
   UnimplementedMachineMapService,
 } from './proto-generated/service';
 
+const grpcPort = 9090;
+
 class MachineMapService extends UnimplementedMachineMapService {
   Pause(
     call: grpc.ServerUnaryCall<Machine, Machine>,
     callback: grpc.sendUnaryData<Machine>
   ): void {
-    throw new Error('Method not implemented.');
+    callback(null, call.request);
   }
   UnPause(
     call: grpc.ServerUnaryCall<Machine, Machine>,
     callback: grpc.sendUnaryData<Machine>
   ): void {
-    throw new Error('Method not implemented.');
+    callback(null, call.request);
   }
   MachineStream(
     call: grpc.ServerWritableStream<MachineStreamRequest, Machine>
@@ -37,9 +39,12 @@ const createServer = () => {
 
 const routeServer = createServer();
 routeServer.bindAsync(
-  '0.0.0.0:50051',
+  `0.0.0.0:${grpcPort}`,
   grpc.ServerCredentials.createInsecure(),
-  () => routeServer.start()
+  (err, port) => {
+    if (err) throw new Error(`Bind error: ${err}`);
+    routeServer.start();
+  }
 );
 
 const app = express();

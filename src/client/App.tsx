@@ -1,7 +1,7 @@
 import {useCallback, useState} from 'react';
 import {Machine, MachineMapClient} from './proto-generated/service';
 
-const GRPC_ADDRESS = 'http://localhost:50051';
+const GRPC_ADDRESS = 'http://localhost:8080';
 
 export default function App() {
   const [client, setClient] = useState(
