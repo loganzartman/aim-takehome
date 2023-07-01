@@ -5,22 +5,46 @@ import {
   MachineStreamRequest,
   UnimplementedMachineMapService,
 } from './proto-generated/service';
+import {createDummyMachines, updateDummyMachines} from './machines';
 
 const grpcPort = 9090;
 
 class MachineMapService extends UnimplementedMachineMapService {
+  #machines: Array<Machine>;
+
+  constructor(machines: Array<Machine>) {
+    super();
+    this.#machines = machines;
+  }
+
   Pause(
     call: grpc.ServerUnaryCall<Machine, Machine>,
     callback: grpc.sendUnaryData<Machine>
   ): void {
-    callback(null, call.request);
+    const reqId = call.request.id;
+    const machine = this.#machines.find((m) => m.id === reqId);
+    if (!machine) {
+      callback(new Error(`No machine with ID ${reqId}`));
+    } else {
+      machine.is_paused = true;
+      callback(null, machine);
+    }
   }
+
   UnPause(
     call: grpc.ServerUnaryCall<Machine, Machine>,
     callback: grpc.sendUnaryData<Machine>
   ): void {
-    callback(null, call.request);
+    const reqId = call.request.id;
+    const machine = this.#machines.find((m) => m.id === reqId);
+    if (!machine) {
+      callback(new Error(`No machine with ID ${reqId}`));
+    } else {
+      machine.is_paused = false;
+      callback(null, machine);
+    }
   }
+
   MachineStream(
     call: grpc.ServerWritableStream<MachineStreamRequest, Machine>
   ): void {
@@ -30,9 +54,15 @@ class MachineMapService extends UnimplementedMachineMapService {
 
 const createServer = () => {
   const server = new grpc.Server();
+  const machines = createDummyMachines();
+
+  setInterval(() => {
+    updateDummyMachines(machines);
+  }, 1000 / 30);
+
   server.addService(
     UnimplementedMachineMapService.definition,
-    new MachineMapService()
+    new MachineMapService(machines)
   );
   return server;
 };
