@@ -6,10 +6,10 @@
     "postinstall": "pnpm install-client && pnpm install-server && pnpm install-envoy",
     "install-client": "cd src/client && pnpm install",
     "install-server": "cd src/server && pnpm install",
-    "install-envoy": "cd src/envoy && docker build -t my-envoy-image .",
+    "install-envoy": "cd envoy && docker build -t my-envoy-image .",
     "start-client": "cd src/client && pnpm start",
     "start-server": "cd src/server && pnpm start",
-    "start-envoy": "cd src/envoy && docker run --rm --name my-envoy-container -p 9901:9901 -p 9090:9090 -p 8080:8080 my-envoy-image",
+    "start-envoy": "cd envoy && docker run --rm --name my-envoy-container -p 9901:9901 -p 9090:9090 -p 8080:8080 my-envoy-image",
     "stop-envoy": "docker stop my-envoy-container",
     "start": "pnpm install && concurrently pnpm:start-client pnpm:start-server pnpm:start-envoy"
   },
