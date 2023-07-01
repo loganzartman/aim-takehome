@@ -5,16 +5,16 @@ import {
   MachineStreamRequest,
   UnimplementedMachineMapService,
 } from './proto-generated/service';
-import {createDummyMachines, updateDummyMachines} from './machines';
+import {MachinesSimulator} from './machines';
 
 const grpcPort = 9090;
 
 class MachineMapService extends UnimplementedMachineMapService {
-  #machines: Array<Machine>;
+  #simulator: MachinesSimulator;
 
-  constructor(machines: Array<Machine>) {
+  constructor(simulator: MachinesSimulator) {
     super();
-    this.#machines = machines;
+    this.#simulator = simulator;
   }
 
   Pause(
@@ -22,7 +22,7 @@ class MachineMapService extends UnimplementedMachineMapService {
     callback: grpc.sendUnaryData<Machine>
   ): void {
     const reqId = call.request.id;
-    const machine = this.#machines.find((m) => m.id === reqId);
+    const machine = this.#simulator.machines.find((m) => m.id === reqId);
     if (!machine) {
       callback(new Error(`No machine with ID ${reqId}`));
     } else {
@@ -36,7 +36,7 @@ class MachineMapService extends UnimplementedMachineMapService {
     callback: grpc.sendUnaryData<Machine>
   ): void {
     const reqId = call.request.id;
-    const machine = this.#machines.find((m) => m.id === reqId);
+    const machine = this.#simulator.machines.find((m) => m.id === reqId);
     if (!machine) {
       callback(new Error(`No machine with ID ${reqId}`));
     } else {
@@ -48,21 +48,32 @@ class MachineMapService extends UnimplementedMachineMapService {
   MachineStream(
     call: grpc.ServerWritableStream<MachineStreamRequest, Machine>
   ): void {
-    throw new Error('Method not implemented.');
+    let ready = true;
+    call.on('drain', () => {
+      ready = true;
+    });
+
+    setInterval(() => {
+      if (ready) {
+        this.#simulator.machines.forEach((machine) => {
+          ready = call.write(machine);
+        });
+      }
+    }, 1000 / 30);
   }
 }
 
 const createServer = () => {
   const server = new grpc.Server();
-  const machines = createDummyMachines();
+  const simulator = new MachinesSimulator();
 
   setInterval(() => {
-    updateDummyMachines(machines);
+    simulator.update();
   }, 1000 / 30);
 
   server.addService(
     UnimplementedMachineMapService.definition,
-    new MachineMapService(machines)
+    new MachineMapService(simulator)
   );
   return server;
 };
