@@ -129,6 +129,7 @@ export default function App() {
   const machineSelector = useMemo(
     () => (
       <select
+        className="font-bold"
         value={selectedMachine}
         onChange={(e) => {
           setSelectedMachine(e.target.value as any);
@@ -162,12 +163,21 @@ export default function App() {
         />
         {machineMarkers}
       </MapContainer>
-      <div className="absolute left-0 top-0 z-[1000]">
-        <div className="max-w-full m-2 p-2 bg-white shadow-lg flex flex-col">
-          <div>Machines</div>
-          {isStreaming ? <div>✅ Connected</div> : <div>⚠️ Not connected</div>}
-          {machineSelector}
-          <div className="flex flex-row gap-1">
+      <div className="absolute left-0 top-0 z-[1000] max-w-full">
+        <div className="m-2 p-4 bg-white shadow-lg rounded-lg flex flex-col gap-2">
+          <div className="flex flex-row flex-wrap items-center justify-between mb-2">
+            <div className="mr-10 text-xl">Machines</div>
+            {isStreaming ? (
+              <div>✅ Connected</div>
+            ) : (
+              <div>⚠️ Not connected</div>
+            )}
+          </div>
+          <div className="flex flex-row flex-wrap gap-2">
+            <div>Select machine:</div>
+            {machineSelector}
+          </div>
+          <div className="flex flex-row flex-wrap gap-1">
             <Button disabled={selectedMachine === ''} onClick={handlePause}>
               Pause
             </Button>
