@@ -63,7 +63,10 @@ export default function App() {
   const machineMarkers = useMemo(
     () =>
       Object.values(machines).map((machine) => (
-        <Marker position={[machine.location.lat, machine.location.lon]} />
+        <Marker
+          key={machine.id}
+          position={[machine.location.lat, machine.location.lon]}
+        />
       )),
     [machines]
   );
