@@ -14,7 +14,10 @@ const seattleLon = -122.34006911204551;
 type MachinesMap = {[key: number]: Machine};
 
 const useMachines = (client: MachineMapClient): MachinesMap => {
+  const [counter, setCounter] = useState(0);
   const [machines, setMachines] = useState<MachinesMap>({});
+
+  const refresh = () => setCounter((c) => c + 1);
 
   useEffect(() => {
     const stream = client.MachineStream(new MachineStreamRequest(), null);
@@ -25,13 +28,15 @@ const useMachines = (client: MachineMapClient): MachinesMap => {
 
     stream.on('error', (err) => {
       console.error(err);
-      throw new Error(err.name);
+      refresh();
     });
+
+    stream.on('end', () => refresh());
 
     return () => {
       stream.cancel();
     };
-  }, [client]);
+  }, [client, counter]);
 
   return machines;
 };
