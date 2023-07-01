@@ -7,10 +7,14 @@ const seattleAlt = 39;
 const rand = (mag: number) => Math.random() * mag - mag / 2;
 
 const createDummyGPS = (): GPS =>
-  new GPS({lat: seattleLat, lon: seattleLon, alt: seattleAlt});
+  new GPS({
+    lat: seattleLat + rand(0.005),
+    lon: seattleLon + rand(0.005),
+    alt: seattleAlt,
+  });
 
 const createDummyMachines = (): Array<Machine> =>
-  Array.from({length: 8}).map(
+  Array.from({length: 16}).map(
     (_, id) =>
       new Machine({
         id,
