@@ -1,10 +1,10 @@
-import {useCallback, useMemo, useEffect} from 'react';
+import {useCallback, useMemo, useEffect, useRef} from 'react';
 import {
   Machine,
   MachineMapClient,
   MachineStreamRequest,
 } from './proto-generated/service';
-import {MapContainer, Marker, TileLayer} from 'react-leaflet';
+import {MapContainer, Marker, TileLayer, useMap} from 'react-leaflet';
 import {useState} from 'react';
 import Button from './components/Button';
 import L from 'leaflet';
@@ -74,10 +74,17 @@ const useMachines = (
   return {machines, isStreaming};
 };
 
+function MapGrabber({mapRef}: {mapRef: {current: L.Map | null}}) {
+  const map = useMap();
+  mapRef.current = map;
+  return null;
+}
+
 export default function App() {
   const client = useMemo(() => new MachineMapClient(GRPC_ADDRESS), []);
   const {machines, isStreaming} = useMachines(client);
   const [selectedMachine, setSelectedMachine] = useState<string>('');
+  const mapRef = useRef<L.Map>(null);
 
   const handleUnPause = useCallback(() => {
     if (selectedMachine !== '') {
@@ -104,6 +111,19 @@ export default function App() {
       );
     }
   }, [client, selectedMachine]);
+
+  const handleFocus = useCallback(() => {
+    if (selectedMachine !== '' && mapRef.current) {
+      const machine = machines[Number.parseInt(selectedMachine)];
+      mapRef.current.setView(
+        [machine.location.lat, machine.location.lon],
+        mapRef.current.getZoom(),
+        {
+          animate: true,
+        }
+      );
+    }
+  }, [machines, selectedMachine]);
 
   const machineMarkers = useMemo(
     () =>
@@ -156,6 +176,7 @@ export default function App() {
         zoomControl={false}
         scrollWheelZoom
       >
+        <MapGrabber mapRef={mapRef} />
         <TileLayer
           // @ts-ignore: Property 'attribution' does not exist; package types are incorrect
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -183,6 +204,9 @@ export default function App() {
             </Button>
             <Button disabled={selectedMachine === ''} onClick={handleUnPause}>
               UnPause
+            </Button>
+            <Button disabled={selectedMachine === ''} onClick={handleFocus}>
+              Focus
             </Button>
           </div>
         </div>
