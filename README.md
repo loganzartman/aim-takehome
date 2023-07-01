@@ -1,6 +1,6 @@
 ## usage
 
-Dependencies: Node 16+, pnpm
+Dependencies: Node 16+, npm, Docker
 
 1. Get pnpm: `npm install -g pnpm`
 2. `pnpm start`
@@ -8,7 +8,8 @@ Dependencies: Node 16+, pnpm
 
 ## regenerating proto outputs
 
-Dependencies: Python 3, `protoc` and `protoc-gen-js` on path
+Dependencies: Python 3, `protoc` on path
 
-1. `cd proto`
-2. `python generate.py`
+1. `npm i -g protoc-gen-ts`
+2. `cd proto`
+3. `python generate.py`
