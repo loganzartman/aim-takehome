@@ -10,6 +10,7 @@ def generate_web(proto_path: str, output_dir: str):
     command = 'protoc'\
       f' -I={proto_path}'\
       f' {os.path.join(proto_path, "*.proto")}'\
+      f' --ts_opt=target=web'\
       f' --ts_out={tmp_dir}'\
       # f' --grpc-web_out=mode=grpcwebtext:{tmp_dir}'''\
       # f' --js_out="import_style=commonjs,binary:{tmp_dir}"'\

@@ -5,6 +5,7 @@
  * git: https://github.com/thesayyn/protoc-gen-ts */
 import * as pb_1 from "google-protobuf";
 import * as grpc_1 from "@grpc/grpc-js";
+import * as grpc_web_1 from "grpc-web";
 export class Machine extends pb_1.Message {
     #one_of_decls: number[][] = [];
     constructor(data?: any[] | {
@@ -297,30 +298,6 @@ export class MachineStreamRequest extends pb_1.Message {
         return MachineStreamRequest.deserialize(bytes);
     }
 }
-interface GrpcUnaryServiceInterface<P, R> {
-    (message: P, metadata: grpc_1.Metadata, options: grpc_1.CallOptions, callback: grpc_1.requestCallback<R>): grpc_1.ClientUnaryCall;
-    (message: P, metadata: grpc_1.Metadata, callback: grpc_1.requestCallback<R>): grpc_1.ClientUnaryCall;
-    (message: P, options: grpc_1.CallOptions, callback: grpc_1.requestCallback<R>): grpc_1.ClientUnaryCall;
-    (message: P, callback: grpc_1.requestCallback<R>): grpc_1.ClientUnaryCall;
-}
-interface GrpcStreamServiceInterface<P, R> {
-    (message: P, metadata: grpc_1.Metadata, options?: grpc_1.CallOptions): grpc_1.ClientReadableStream<R>;
-    (message: P, options?: grpc_1.CallOptions): grpc_1.ClientReadableStream<R>;
-}
-interface GrpWritableServiceInterface<P, R> {
-    (metadata: grpc_1.Metadata, options: grpc_1.CallOptions, callback: grpc_1.requestCallback<R>): grpc_1.ClientWritableStream<P>;
-    (metadata: grpc_1.Metadata, callback: grpc_1.requestCallback<R>): grpc_1.ClientWritableStream<P>;
-    (options: grpc_1.CallOptions, callback: grpc_1.requestCallback<R>): grpc_1.ClientWritableStream<P>;
-    (callback: grpc_1.requestCallback<R>): grpc_1.ClientWritableStream<P>;
-}
-interface GrpcChunkServiceInterface<P, R> {
-    (metadata: grpc_1.Metadata, options?: grpc_1.CallOptions): grpc_1.ClientDuplexStream<P, R>;
-    (options?: grpc_1.CallOptions): grpc_1.ClientDuplexStream<P, R>;
-}
-interface GrpcPromiseServiceInterface<P, R> {
-    (message: P, metadata: grpc_1.Metadata, options?: grpc_1.CallOptions): Promise<R>;
-    (message: P, options?: grpc_1.CallOptions): Promise<R>;
-}
 export abstract class UnimplementedMachineMapService {
     static definition = {
         Pause: {
@@ -356,17 +333,26 @@ export abstract class UnimplementedMachineMapService {
     abstract UnPause(call: grpc_1.ServerUnaryCall<Machine, Machine>, callback: grpc_1.sendUnaryData<Machine>): void;
     abstract MachineStream(call: grpc_1.ServerWritableStream<MachineStreamRequest, Machine>): void;
 }
-export class MachineMapClient extends grpc_1.makeGenericClientConstructor(UnimplementedMachineMapService.definition, "MachineMap", {}) {
-    constructor(address: string, credentials: grpc_1.ChannelCredentials, options?: Partial<grpc_1.ChannelOptions>) {
-        super(address, credentials, options);
+export class MachineMapClient {
+    private _address: string;
+    private _client: grpc_web_1.GrpcWebClientBase;
+    constructor(address: string, credentials?: Object, options?: grpc_web_1.GrpcWebClientBaseOptions) {
+        if (!options)
+            options = {};
+        options.format = options.format || "text";
+        this._address = address;
+        this._client = new grpc_web_1.GrpcWebClientBase(options);
     }
-    Pause: GrpcUnaryServiceInterface<Machine, Machine> = (message: Machine, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<Machine>, options?: grpc_1.CallOptions | grpc_1.requestCallback<Machine>, callback?: grpc_1.requestCallback<Machine>): grpc_1.ClientUnaryCall => {
-        return super.Pause(message, metadata, options, callback);
-    };
-    UnPause: GrpcUnaryServiceInterface<Machine, Machine> = (message: Machine, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<Machine>, options?: grpc_1.CallOptions | grpc_1.requestCallback<Machine>, callback?: grpc_1.requestCallback<Machine>): grpc_1.ClientUnaryCall => {
-        return super.UnPause(message, metadata, options, callback);
-    };
-    MachineStream: GrpcStreamServiceInterface<MachineStreamRequest, MachineStreamRequest> = (message: MachineStreamRequest, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): grpc_1.ClientReadableStream<MachineStreamRequest> => {
-        return super.MachineStream(message, metadata, options);
-    };
+    private static Pause = new grpc_web_1.MethodDescriptor<Machine, Machine>("/MachineMap/Pause", grpc_web_1.MethodType.UNARY, Machine, Machine, (message: Machine) => message.serialize(), Machine.deserialize);
+    Pause(message: Machine, metadata: grpc_web_1.Metadata | null, callback: (error: grpc_web_1.RpcError, response: Machine) => void) {
+        return this._client.rpcCall<Machine, Machine>(this._address + "/MachineMap/Pause", message, metadata || {}, MachineMapClient.Pause, callback);
+    }
+    private static UnPause = new grpc_web_1.MethodDescriptor<Machine, Machine>("/MachineMap/UnPause", grpc_web_1.MethodType.UNARY, Machine, Machine, (message: Machine) => message.serialize(), Machine.deserialize);
+    UnPause(message: Machine, metadata: grpc_web_1.Metadata | null, callback: (error: grpc_web_1.RpcError, response: Machine) => void) {
+        return this._client.rpcCall<Machine, Machine>(this._address + "/MachineMap/UnPause", message, metadata || {}, MachineMapClient.UnPause, callback);
+    }
+    private static MachineStream = new grpc_web_1.MethodDescriptor<MachineStreamRequest, Machine>("/MachineMap/MachineStream", grpc_web_1.MethodType.SERVER_STREAMING, MachineStreamRequest, Machine, (message: MachineStreamRequest) => message.serialize(), Machine.deserialize);
+    MachineStream(message: MachineStreamRequest, metadata: grpc_web_1.Metadata | null) {
+        return this._client.serverStreaming(this._address + "/MachineMap/MachineStream", message, metadata || {}, MachineMapClient.MachineStream);
+    }
 }
