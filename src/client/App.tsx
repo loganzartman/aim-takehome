@@ -4,7 +4,7 @@ import {
   MachineMapClient,
   MachineStreamRequest,
 } from './proto-generated/service';
-import {MapContainer, Marker, Popup, TileLayer} from 'react-leaflet';
+import {MapContainer, Marker, TileLayer} from 'react-leaflet';
 import {useState} from 'react';
 import Button from './components/Button';
 import L from 'leaflet';
@@ -80,11 +80,30 @@ export default function App() {
   const [selectedMachine, setSelectedMachine] = useState<string>('');
 
   const handleUnPause = useCallback(() => {
-    client.UnPause(new Machine({id: 0}), {}, (err, resp) => {
-      if (err) throw new Error(err.message);
-      console.log(resp);
-    });
-  }, []);
+    if (selectedMachine !== '') {
+      client.UnPause(
+        new Machine({id: Number.parseInt(selectedMachine)}),
+        {},
+        (err, resp) => {
+          if (err) throw new Error(err.message);
+          console.log(resp);
+        }
+      );
+    }
+  }, [client, selectedMachine]);
+
+  const handlePause = useCallback(() => {
+    if (selectedMachine !== '') {
+      client.Pause(
+        new Machine({id: Number.parseInt(selectedMachine)}),
+        {},
+        (err, resp) => {
+          if (err) throw new Error(err.message);
+          console.log(resp);
+        }
+      );
+    }
+  }, [client, selectedMachine]);
 
   const machineMarkers = useMemo(
     () =>
@@ -148,7 +167,14 @@ export default function App() {
           <div>Machines</div>
           {isStreaming ? <div>✅ Connected</div> : <div>⚠️ Not connected</div>}
           {machineSelector}
-          <Button onClick={handleUnPause}>UnPause</Button>
+          <div className="flex flex-row gap-1">
+            <Button disabled={selectedMachine === ''} onClick={handlePause}>
+              Pause
+            </Button>
+            <Button disabled={selectedMachine === ''} onClick={handleUnPause}>
+              UnPause
+            </Button>
+          </div>
         </div>
       </div>
     </div>
