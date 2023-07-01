@@ -4,13 +4,38 @@ import {
   MachineMapClient,
   MachineStreamRequest,
 } from './proto-generated/service';
-import {MapContainer, Marker, TileLayer} from 'react-leaflet';
+import {MapContainer, Marker, Popup, TileLayer} from 'react-leaflet';
 import {useState} from 'react';
 import Button from './components/Button';
+import L from 'leaflet';
 
 const GRPC_ADDRESS = 'http://localhost:8080';
 const seattleLat = 47.60884551040699;
 const seattleLon = -122.34006911204551;
+
+const normalMarkerSvg = `
+  <svg width="48" height="48" fill="dodgerblue" stroke="white" stroke-width="1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z"/>
+  </svg>
+`;
+
+const selectedMarkerSvg = `
+  <svg width="48" height="48" fill="red" stroke="white" stroke-width="1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z"/>
+  </svg>
+`;
+
+const normalMarkerIcon = L.divIcon({
+  className: '',
+  html: normalMarkerSvg,
+  iconSize: [48, 48],
+});
+
+const selectedMarkerIcon = L.divIcon({
+  className: '',
+  html: selectedMarkerSvg,
+  iconSize: [48, 48],
+});
 
 type MachinesMap = {[key: number]: Machine};
 
@@ -52,6 +77,7 @@ const useMachines = (
 export default function App() {
   const client = useMemo(() => new MachineMapClient(GRPC_ADDRESS), []);
   const {machines, isStreaming} = useMachines(client);
+  const [selectedMachine, setSelectedMachine] = useState<string>('');
 
   const handleUnPause = useCallback(() => {
     client.UnPause(new Machine({id: 0}), {}, (err, resp) => {
@@ -66,9 +92,38 @@ export default function App() {
         <Marker
           key={machine.id}
           position={[machine.location.lat, machine.location.lon]}
-        />
+          icon={
+            selectedMachine === String(machine.id)
+              ? selectedMarkerIcon
+              : normalMarkerIcon
+          }
+          eventHandlers={{
+            click: () => {
+              setSelectedMachine(String(machine.id));
+            },
+          }}
+        ></Marker>
       )),
-    [machines]
+    [machines, selectedMachine]
+  );
+
+  const machineSelector = useMemo(
+    () => (
+      <select
+        value={selectedMachine}
+        onChange={(e) => {
+          setSelectedMachine(e.target.value as any);
+        }}
+      >
+        <option value="">None</option>
+        {Object.values(machines).map((machine) => (
+          <option key={machine.id} value={machine.id}>
+            ID: {machine.id}
+          </option>
+        ))}
+      </select>
+    ),
+    [machines, selectedMachine]
   );
 
   return (
@@ -92,6 +147,7 @@ export default function App() {
         <div className="max-w-full m-2 p-2 bg-white shadow-lg flex flex-col">
           <div>Machines</div>
           {isStreaming ? <div>✅ Connected</div> : <div>⚠️ Not connected</div>}
+          {machineSelector}
           <Button onClick={handleUnPause}>UnPause</Button>
         </div>
       </div>
