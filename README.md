@@ -33,6 +33,17 @@ When you're done:
 - Select a machine using the dropdown, or by clicking on its icon
 - With a machine selected, use the buttons to perform actions
 
+## notes on testing
+
+There's no automated testing yet. Here are some things that could be tested:
+
+- Start client and server, check that client shows "connected"
+- A pin appears on the map for each distinct machine written to MachineStream
+- When the server writes to MachineStream, a corresponding pin on the map moves
+- Selecting a machine and clicking "(Un)Pause" causes the server to receive (Un)Pause RPC
+- Clicking on a map pin selects the correct machine
+- The client calls MachineStream again if the stream ends (reconnect)
+
 ## development
 
 - The server and client support hot-reloading.
