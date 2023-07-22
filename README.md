@@ -4,6 +4,8 @@
 
 ## overview
 
+This project demonstrates how to create a simple real-time web-based map visualization that communicates with a Node.js server over [GRPC](https://grpc.io/). The server and client communicate using GRPC, using code generated from the service defined in the `proto` directory. The server has simulated "robots", which just move around randomly. Their positions are visualized on top of a map using [Leaflet](https://leafletjs.com/).
+
 The project consists of three components:
 
 1. Web client
